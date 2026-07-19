@@ -94,7 +94,13 @@ foreach my $perl ( @{$perl_versions}, @{$perl_testing} ) {
         warn "[DEBUG]   Found files: " . join(', ', @files) . "\n" if $verbose;
         warn "[DEBUG]   File count: " . scalar(@files) . "\n" if $verbose;
 
-        die "Could not find perl ${fileroot}.*" unless scalar(@files) or $fileroot =~ m/RC/;
+        if (!scalar(@files) && $fileroot !~ m/RC/) {
+            if ($perl->{status} eq 'stable') {
+                die "Could not find stable perl release ${fileroot}.*\n";
+            } else {
+                warn "Skipping missing development/testing perl release: ${fileroot}\n";
+            }
+        }
 
         $perl->{files} = [];
         foreach my $file (@files) {
